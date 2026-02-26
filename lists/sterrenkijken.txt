@@ -1,0 +1,11 @@
+stargazing;sterrenkijken
+lion;leeuw
+Great Bear;Grote Beer
+water snake;waterslang
+scorpion;schorpioen
+twins;tweeling
+swan;zwaan
+blanket;deken
+torch;zaklamp
+lie down;liggen
+warm jumper;warme trui
