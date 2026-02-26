@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Duits–Nederlands Flashcards</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 16px 40px;
+      color: #f0f0f0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .header-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .header-title span { font-size: 1.4rem; }
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: #a0a8c0;
+    }
+    .score-badge {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 0.8rem;
+      color: #e2e8f0;
+    }
+    .score-correct { color: #48bb78; font-weight: 700; }
+    .score-wrong   { color: #fc8181; font-weight: 700; }
+
+    /* ── PROGRESS BAR ── */
+    .progress-bar-wrap {
+      width: 100%;
+      max-width: 600px;
+      height: 4px;
+      background: #16213e;
+      border-radius: 99px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    /* ── CARD ── */
+    .card-scene {
+      width: 100%;
+      max-width: 600px;
+      height: 260px;
+      perspective: 1000px;
+      cursor: pointer;
+      margin-bottom: 28px;
+    }
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 20px;
+    }
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* FRONT */
+    .card-front {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      border: 1px solid #1e3a5f;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .card-front .lang-label {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #667eea;
+      font-weight: 600;
+    }
+    .card-front .german-word {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      color: #f7fafc;
+      line-height: 1.25;
+    }
+    .card-front .hint {
+      font-size: 0.8rem;
+      color: #4a5568;
+      letter-spacing: 1px;
+    }
+
+    /* BACK */
+    .card-back {
+      background: linear-gradient(135deg, #1a1a4e 0%, #2d1b69 100%);
+      border: 1px solid #553c9a;
+      box-shadow: 0 20px 60px rgba(102,126,234,0.25);
+      transform: rotateY(180deg);
+    }
+    .card-back .german-small {
+      font-size: 0.95rem;
+      color: #a0aec0;
+      text-align: center;
+    }
+    .card-back .divider {
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 99px;
+    }
+    .card-back .dutch-word {
+      font-size: 1.9rem;
+      font-weight: 700;
+      text-align: center;
+      color: #e9d5ff;
+      line-height: 1.25;
+    }
+    .card-back .lang-label {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #9f7aea;
+      font-weight: 600;
+    }
+
+    /* ── ASSESSMENT BUTTONS ── */
+    .assess-buttons {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .assess-buttons.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .btn-wrong, .btn-correct {
+      flex: 1;
+      padding: 14px 0;
+      border-radius: 14px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.15s, filter 0.15s;
+    }
+    .btn-wrong:hover   { filter: brightness(1.15); transform: translateY(-2px); }
+    .btn-correct:hover { filter: brightness(1.15); transform: translateY(-2px); }
+    .btn-wrong:active, .btn-correct:active { transform: translateY(0); }
+    .btn-wrong {
+      background: #2d1b1b;
+      color: #fc8181;
+      border: 1px solid #4a2020;
+    }
+    .btn-correct {
+      background: #1b2d1b;
+      color: #68d391;
+      border: 1px solid #204a20;
+    }
+
+    /* ── NAV BUTTONS ── */
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+    }
+    .btn-nav {
+      flex: 1;
+      padding: 13px 0;
+      border-radius: 14px;
+      border: 1px solid #1e3a5f;
+      background: #16213e;
+      color: #a0aec0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.15s;
+    }
+    .btn-nav:hover { background: #1e3a5f; color: #f0f0f0; transform: translateY(-2px); }
+    .btn-nav:active { transform: translateY(0); }
+    .btn-next {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: transparent;
+      color: #fff;
+    }
+    .btn-next:hover { filter: brightness(1.1); background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+
+    /* ── KEYBOARD HINT ── */
+    .keyboard-hint {
+      margin-top: 24px;
+      font-size: 0.75rem;
+      color: #2d3748;
+      letter-spacing: 0.5px;
+    }
+    kbd {
+      background: #16213e;
+      border: 1px solid #2d3748;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.7rem;
+      color: #718096;
+    }
+
+    /* ── DECK COMPLETE ── */
+    .deck-complete {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+      padding: 48px 32px;
+      background: #16213e;
+      border-radius: 20px;
+      border: 1px solid #1e3a5f;
+      width: 100%;
+      max-width: 600px;
+    }
+    .deck-complete .emoji { font-size: 3rem; }
+    .deck-complete h2 { font-size: 1.5rem; }
+    .deck-complete p { color: #a0aec0; }
+    .btn-restart {
+      margin-top: 8px;
+      padding: 14px 40px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
+    .btn-restart:hover { filter: brightness(1.1); }
+
+    @media (max-width: 480px) {
+      .card-front .german-word, .card-back .dutch-word { font-size: 1.5rem; }
+      .card-scene { height: 220px; }
+    }
+
+    /* ── SCREEN MANAGEMENT ── */
+    [data-screen]        { display: none; }
+    [data-screen].active { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+    /* ── SHARED SCREEN HEADER ── */
+    .screen-header {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .screen-header-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .screen-header-title span { font-size: 1.4rem; }
+    .btn-back {
+      background: none;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      color: #a0aec0;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-back:hover { background: #1e3a5f; color: #f0f0f0; }
+    .btn-new {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
+    .btn-new:hover { filter: brightness(1.1); }
+
+    /* ── HOME SCREEN ── */
+    #home-list-container { width: 100%; max-width: 600px; }
+    .list-card {
+      background: #16213e;
+      border: 1px solid #1e3a5f;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .list-card-info { flex: 1; min-width: 0; }
+    .list-card-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .list-card-count { font-size: 0.8rem; color: #a0a8c0; margin-top: 2px; }
+    .list-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-lc {
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter 0.2s, transform 0.15s;
+      border: 1px solid transparent;
+    }
+    .btn-lc:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-lc:active { transform: translateY(0); }
+    .btn-lc-study {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+    .btn-lc-edit  { background: #16213e; border-color: #1e3a5f; color: #a0aec0; }
+    .btn-lc-del   { background: #2d1b1b; border-color: #4a2020; color: #fc8181; }
+    .confirm-row {
+      display: none;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.82rem;
+      color: #fc8181;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .confirm-row.visible { display: flex; }
+    .btn-confirm-yes { background: #2d1b1b; border: 1px solid #4a2020; color: #fc8181;
+                       padding: 4px 12px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; }
+    .btn-confirm-no  { background: #16213e; border: 1px solid #1e3a5f; color: #a0aec0;
+                       padding: 4px 12px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; }
+    .empty-state {
+      color: #4a5568;
+      text-align: center;
+      padding: 48px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* ── ADD / EDIT SCREEN ── */
+    .field-label {
+      width: 100%;
+      max-width: 600px;
+      font-size: 0.75rem;
+      color: #a0a8c0;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      margin-top: 20px;
+    }
+    .list-name-input {
+      width: 100%;
+      max-width: 600px;
+      background: #16213e;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #f0f0f0;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .list-name-input:focus { border-color: #667eea; }
+    .pairs-textarea {
+      width: 100%;
+      max-width: 600px;
+      height: 280px;
+      background: #16213e;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: #f0f0f0;
+      font-size: 0.88rem;
+      font-family: 'Consolas', 'Courier New', monospace;
+      line-height: 1.7;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .pairs-textarea:focus { border-color: #667eea; }
+    .parse-warning { width: 100%; max-width: 600px; color: #fc8181; font-size: 0.8rem; margin-top: 6px; min-height: 1em; }
+    .field-error   { width: 100%; max-width: 600px; color: #fc8181; font-size: 0.8rem; margin-top: 4px; min-height: 1em; }
+    .btn-save {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 24px;
+      padding: 14px 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
+    .btn-save:hover { filter: brightness(1.1); }
+    .btn-home-lists {
+      margin-top: 12px;
+      padding: 13px 32px;
+      border-radius: 14px;
+      background: #16213e;
+      border: 1px solid #1e3a5f;
+      color: #a0aec0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-home-lists:hover { background: #1e3a5f; color: #f0f0f0; }
+
+    /* ── LOGIN SCREEN ── */
+    #screen-login { justify-content: center; min-height: 100vh; }
+    .login-box { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 340px; }
+    .login-title { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; text-align: center; }
+    .login-input {
+      width: 100%; background: #16213e; border: 1px solid #1e3a5f; border-radius: 10px;
+      padding: 12px 16px; color: #f0f0f0; font-size: 1rem; outline: none;
+      transition: border-color 0.2s; text-align: center;
+    }
+    .login-input:focus { border-color: #667eea; }
+    .login-input.shake { animation: shake 0.4s ease; }
+    .login-btn {
+      width: 100%; padding: 13px 0; border-radius: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: filter 0.2s;
+    }
+    .login-btn:hover { filter: brightness(1.1); }
+    .login-error { display: none; color: #fc8181; font-size: 0.88rem; text-align: center; }
+    .login-error.visible { display: block; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-8px); }
+      40%     { transform: translateX(8px); }
+      60%     { transform: translateX(-6px); }
+      80%     { transform: translateX(6px); }
+    }
+
+    /* ── GITHUB BADGE + LOADING ── */
+    .gh-badge {
+      display: inline-block; font-size: 0.7rem; background: #16213e; border: 1px solid #1e3a5f;
+      border-radius: 6px; padding: 1px 7px; color: #a0aec0; margin-left: 6px; vertical-align: middle;
+    }
+    .gh-loading-row { display: flex; align-items: center; gap: 10px; color: #4a5568; font-size: 0.88rem; padding: 12px 20px; }
+    .gh-spinner {
+      width: 14px; height: 14px; border: 2px solid #1e3a5f; border-top-color: #667eea;
+      border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gh-rate-limit { color: #a0a8c0; font-size: 0.8rem; padding: 8px 20px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN: LOGIN  (password gate)
+  ══════════════════════════════════════════════════════════ -->
+  <div id="screen-login" data-screen>
+    <div class="login-box">
+      <div class="login-title"><span>🇩🇪</span> Woordenlijsten</div>
+      <input id="loginPasswordInput" class="login-input" type="password"
+             placeholder="Wachtwoord" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') tryLogin()" />
+      <button class="login-btn" onclick="tryLogin()">Inloggen</button>
+      <div class="login-error" id="loginError">Onjuist wachtwoord</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN: HOME  (list picker)
+  ══════════════════════════════════════════════════════════ -->
+  <div id="screen-home" data-screen>
+    <div class="screen-header">
+      <div class="screen-header-title"><span>🇩🇪</span> Mijn Lijsten</div>
+      <button class="btn-new" onclick="openAddScreen()">+ Nieuw</button>
+    </div>
+    <div id="home-list-container"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN: ADD / EDIT list
+  ══════════════════════════════════════════════════════════ -->
+  <div id="screen-add" data-screen>
+    <div class="screen-header">
+      <button class="btn-back" onclick="goHome()">← Terug</button>
+      <div class="screen-header-title" id="addScreenTitle">Nieuwe lijst</div>
+      <div style="width:80px"></div>
+    </div>
+    <div class="field-label">Naam</div>
+    <input  class="list-name-input" id="listNameInput" type="text" placeholder="Bijv. Hoofdstuk 5" />
+    <div class="field-error" id="nameError"></div>
+    <div class="field-label">Woordparen &nbsp;<small style="font-size:0.7rem;color:#4a5568;text-transform:none;letter-spacing:0">(Duits;Nederlands — één per regel, ook tab-gescheiden)</small></div>
+    <textarea class="pairs-textarea" id="pairsTextarea"
+      placeholder="das Haus;het huis&#10;der Hund;de hond&#10;die Katze;de kat"></textarea>
+    <div class="parse-warning" id="parseWarning"></div>
+    <button class="btn-save" onclick="saveList()">Opslaan</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SCREEN: STUDY
+  ══════════════════════════════════════════════════════════ -->
+  <div id="screen-study" data-screen>
+
+    <header>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn-back" onclick="goHome()">← Lijsten</button>
+        <div class="header-title" id="studyListName" style="font-size:1rem;color:#a0aec0"></div>
+      </div>
+      <div class="header-meta">
+        <div class="score-badge">
+          Score: <span class="score-correct" id="scoreCorrect">0</span> /
+                 <span class="score-wrong"   id="scoreWrong">0</span>
+        </div>
+        <span id="cardCounter">Kaart 1 / ?</span>
+      </div>
+    </header>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- Card -->
+    <div class="card-scene" id="cardScene" onclick="flipCard()">
+      <div class="card" id="card">
+        <!-- FRONT -->
+        <div class="card-face card-front">
+          <div class="lang-label">Duits</div>
+          <div class="german-word" id="frontWord">…</div>
+          <div class="hint">klik om te onthullen</div>
+        </div>
+        <!-- BACK -->
+        <div class="card-face card-back">
+          <div class="german-small" id="backGerman">…</div>
+          <div class="divider"></div>
+          <div class="dutch-word" id="backDutch">…</div>
+          <div class="lang-label">Nederlands</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assessment buttons (shown after flip) -->
+    <div class="assess-buttons" id="assessButtons">
+      <button class="btn-wrong"   onclick="markWrong()">✗&nbsp;&nbsp;Fout</button>
+      <button class="btn-correct" onclick="markCorrect()">✓&nbsp;&nbsp;Goed</button>
+    </div>
+
+    <!-- Nav buttons -->
+    <div class="nav-buttons">
+      <button class="btn-nav"          onclick="prevCard()">← Vorige</button>
+      <button class="btn-nav btn-next" onclick="nextCard()">Volgende →</button>
+    </div>
+
+    <!-- Deck complete screen -->
+    <div class="deck-complete" id="deckComplete">
+      <div class="emoji">🎉</div>
+      <h2>Deck voltooid!</h2>
+      <p id="finalScore">Je hebt alle kaarten gezien.</p>
+      <button class="btn-restart" onclick="restartDeck()">Opnieuw beginnen</button>
+      <button class="btn-home-lists" onclick="goHome()">← Terug naar lijsten</button>
+    </div>
+
+    <div class="keyboard-hint">
+      <kbd>Spatie</kbd> omdraaien &nbsp;·&nbsp;
+      <kbd>→</kbd> volgende woord &nbsp;·&nbsp;
+      <kbd>←</kbd> vorige &nbsp;·&nbsp;
+      <kbd>1</kbd> fout &nbsp;·&nbsp;
+      <kbd>2</kbd> goed
+    </div>
+
+  </div><!-- /screen-study -->
+
+  <script>
+  // ── DATA ──────────────────────────────────────────────────────────────────
+  const pairs = [
+    // Page 39 – Opvoeding en gezin 2
+    ["die Jugend", "de jeugd"],
+    ["die Jugendliche", "de jongere, de adolescent"],
+    ["bewerten", "beoordelen"],
+    ["gestalten", "vorm geven, oplossen, bepalen"],
+    ["sich gestalten", "verlopen, plaatsvinden"],
+    ["heranwachsen", "opgroeien"],
+    ["erwachsen", "volwassen"],
+    ["aufwachsen", "opgroeien"],
+    ["die Nachwelt", "de komende generatie(s)"],
+    ["die Mitwelt", "de tijdgenoten"],
+    ["die Geschwister (mv.)", "de broer(s) en zus(ten)"],
+    ["stolz", "trots"],
+    ["schmücken", "versieren"],
+    ["der Schmuck", "het sieraad, de sieraden"],
+    ["überfliegen", "doornemen, overlopen"],
+    ["die Zwietracht", "de onenigheid"],
+    ["beerben", "erven van"],
+    ["betreten", "betreden"],
+    ["das Enkelkind", "het kleinkind"],
+    ["die Enkelin", "de kleindochter"],
+    ["ausstatten", "uitrusten"],
+    ["die Angehörige", "het familielid"],
+    ["angehören", "lid zijn van"],
+    ["die Verwandte", "het familielid"],
+    ["das Alter", "de leeftijd"],
+    // Page 41 – Recht en rechtspraak 2
+    ["der Gesetzgeber", "de wetgever"],
+    ["der Widerstand", "de tegenstand, het verzet"],
+    ["der Rechtsanwalt", "de advocaat"],
+    ["das Gesetz", "de wet"],
+    ["gesetzlich", "wettelijk"],
+    ["das Grundgesetz", "de grondwet"],
+    ["der Auswuchs", "de uitwas"],
+    ["zweckdienlich", "doeltreffend"],
+    ["der Aufschub", "het uitstel"],
+    ["angehend", "aankomend"],
+    ["fraglich", "twijfelachtig"],
+    ["haften", "aansprakelijk zijn, plakken, zitten"],
+    ["die Tatsache", "het feit"],
+    ["die Maßnahme", "de maatregel"],
+    ["verstoßen gegen", "strijdig zijn met, overtreden"],
+    ["der Anspruch", "het recht, de aanspraak"],
+    ["vermitteln", "bemiddelen"],
+    ["beraten", "adviseren"],
+    ["das Verwaltungsrecht", "het bestuursrecht"],
+    ["die Genehmigung", "de vergunning"],
+    ["lediglich", "uitsluitend"],
+    // Page 42 – Ruimte en plaats
+    ["ausgedehnt", "uitgestrekt"],
+    ["die Insel", "het eiland"],
+    ["der Abhang", "de helling"],
+    ["die Lage", "de positie"],
+    ["das Gelände", "het terrein"],
+    ["einwandern", "immigreren"],
+    ["der Sumpf", "het moeras"],
+    ["das Moor", "het veen"],
+    ["unwirtlich", "ongastvrij"],
+    ["hervorragend", "uitstekend"],
+    ["heimisch", "thuis, inheems, binnenlands"],
+    ["die Wüste", "de woestijn"],
+    ["prägen", "een stempel drukken op"],
+    ["jenseits", "aan de overkant van"],
+    ["entlegen", "afgelegen"],
+    ["die Strecke", "het traject, de afstand"],
+    ["das Ziel", "het doel"],
+    ["sich zurechtfinden", "zijn weg vinden"],
+    ["beziehungsweise", "respectievelijk"],
+    ["gebirgig", "bergachtig"],
+    // Page 43 – Samen leven 1
+    ["gesellig", "sociaal"],
+    ["gemütlich", "gezellig"],
+    ["die Begegnung", "ontmoeting, bijeenkomst"],
+    ["begegnen", "tegenkomen"],
+    ["gemeinsam", "gemeenschappelijk"],
+    ["die Gesellschaft", "het gezelschap, de maatschappij"],
+    ["seine Aufwartung machen", "zijn opwachting maken"],
+    ["die kalte Schulter", "de koude schouder"],
+    ["sich verabschieden", "afscheid nemen"],
+    ["die Gattin", "de echtgenote"],
+    ["die Gastgeberin", "de gastvrouw"],
+    ["die Ergänzung", "de aanvulling"],
+    ["die Beziehung", "de relatie, de connectie"],
+    ["einzeln", "individueel"],
+    ["die Einheit", "het eens zijn met"],
+    ["bestimmen", "instemmen met"],
+    ["beitreten", "lid worden van, toetreden tot"],
+    // Page 45 – Sport en spel 1
+    ["das Mitglied", "het lid"],
+    ["die Ausdauer", "het uithoudingsvermogen"],
+    ["unbedingt", "onvoorwaardelijk"],
+    ["das Ergebnis", "het resultaat"],
+    ["die Angaben", "de gegevens"],
+    ["gleichfalls", "eveneens"],
+    ["ohnehin", "toch (wel)"],
+    ["sich versagen", "iets weigeren"],
+    ["die Schinderei", "de afbeulerij"],
+    ["erkennen", "herkennen"],
+    ["auskommen", "overweg kunnen"],
+    ["einheitlich", "uniform"],
+    ["die Veranstaltung", "het evenement"],
+    ["schwitzen", "zweten"],
+    ["überlegen", "superieur, de betere"],
+    ["gewachsen sein", "opgewassen zijn tegen"],
+    ["unterliegen", "verliezen van"],
+    ["leisten", "presteren"],
+    ["die Begeisterung", "het enthousiasme"],
+    ["sich begeistern", "warm lopen"],
+    ["austragen", "spelen, houden"],
+    ["der Vorstand", "het bestuur"],
+    ["abermals", "nogmaals, opnieuw"],
+    ["besiegen", "winnen van"],
+    // Page 46 – Sport en spel 2
+    ["der Ersatz", "de vervanging"],
+    ["der Ersatzspieler", "reservespeler"],
+    ["die Fehlereinschätzung", "de foute beslissing"],
+    ["der Tabellenführer", "koploper"],
+    ["das Heimspiel", "de thuiswedstrijd"],
+    ["ausscheiden", "uitschakelen"],
+    ["entscheidend", "beslissend"],
+    ["der Ausgleich", "de gelijkmaker"],
+    ["der Meister", "de kampioen"],
+    ["verfügen über", "beschikken over"],
+    ["vermarkten", "te gelde maken"],
+    ["passen", "missen"],
+    ["die Verzögerung", "de vertraging"],
+    ["verletzt", "geblesseerd"],
+    ["verletzen", "kwetsen"],
+    ["übertragen", "uitzenden"],
+    ["der Verband", "de bond"],
+    ["der Zwischenfall", "het incident"],
+    ["beteiligt sein an", "betrokken zijn bij"],
+    ["die Grundlage", "de basis"],
+    ["die Nebensache", "de bijzaak"],
+    // Page 47 – Staat en politiek 1
+    ["das Grundgesetz", "de grondwet"],
+    ["die Würde", "de waardigheid, de integriteit"],
+    ["das Bundesverfassungsgericht", "het constitutioneel hof"],
+    ["die Verfassung", "de constitutie, de grondwet"],
+    ["das Staatswesen", "de staat"],
+    ["der Repräsentant", "de vertegenwoordiger"],
+    ["der Bundesrat", "de Bondsraad"],
+    ["das Land", "de deelstaat"],
+    ["verabschieden", "aannemen"],
+    ["der Antrag", "het voorstel, de motie"],
+    ["erlassen", "afkondigen"],
+    ["wählen", "kiezen"],
+    ["der Wähler", "de kiezer"],
+    ["die Wahlen", "de verkiezingen"],
+    ["der Abgeordnete", "de afgevaardigde"],
+    ["gaukeln", "voorspiegelen"],
+    ["hinnehmen", "aanvaarden, accepteren"],
+    ["vertreten", "vertegenwoordigen, vervangen"],
+    ["der Wandel", "de verandering"],
+    ["unwandelbar", "onveranderbaar"],
+    ["entgegengesetzt", "tegengesteld"],
+    // Page 48 – Staat en politiek 2
+    ["die Steuern", "de belastingen"],
+    ["steuerfrei", "belastingvrij"],
+    ["die Schicht", "de laag, de ploeg"],
+    ["die Einsparung", "de bezuiniging"],
+    ["die Botschaft", "de ambassade"],
+    ["das Abkommen", "de overeenkomst"],
+    ["die Subvention", "de subsidie"],
+    ["subventionieren", "subsidiëren"],
+    ["der Misserfolg", "de mislukking"],
+    ["der Stellenwert", "de plaats, de functie"],
+    ["die Ebene", "het vlak"],
+    ["die Umfrage", "de enquête"],
+    ["verschleiern", "verhullen"],
+    ["die Auseinandersetzung", "de discussie, het conflict"],
+    ["sich auseinandersetzen mit", "zich intensief bezighouden met"],
+    ["gegenwärtig", "momenteel, tegenwoordig"],
+    ["die Behörde", "de autoriteit, de overheid"],
+    ["etabliert", "gevestigd"],
+    ["anprangern", "aan de kaak stellen, bekritiseren"],
+    ["der Pranger", "de schandpaal"],
+    ["herziehen über", "neerhalen, afkraken"],
+    // Page 49 – Tijd en uur
+    ["der Termin", "de termijn"],
+    ["die Frist", "de termijn"],
+    ["endgültig", "definitief"],
+    ["neuerdings", "sinds kort"],
+    ["ehemals", "voorheen"],
+    ["derzeit", "momenteel"],
+    ["irgendwann", "eens"],
+    ["neulich", "onlangs"],
+    ["zeitweilig", "tijdelijk"],
+    ["allenfalls", "hoogstens"],
+    ["ansonsten", "anders"],
+    ["pünktlich", "stipt"],
+    ["demnächst", "binnenkort"],
+    ["das Zeitalter", "het tijdperk"],
+    ["bisherig", "tot nu toe"],
+    ["vorher", "van tevoren"],
+    ["im Voraus", "bij voorbaat"],
+    ["das Jahrzehnt", "het decennium"],
+    ["das Vorjahr", "het vorig jaar"],
+    ["unverzüglich", "onmiddellijk"],
+    ["nach wie vor", "nog steeds"],
+    // Page 50 – Vakantie en vrije tijd 1
+    ["der Reiseführer", "de reisgids"],
+    ["die Sehenswürdigkeit", "de bezienswaardigheid"],
+    ["verheißen", "beloven"],
+    ["die Auskunft", "de inlichting"],
+    ["die Veranstaltung", "het evenement"],
+    ["veranstalten", "organiseren"],
+    ["die Sackgasse", "de doodlopende straat"],
+    ["in die Sackgasse geraten", "op dood spoor zitten"],
+    ["der Urlaub", "de vakantie"],
+    ["die Ferien", "de vakantie"],
+    ["beurlaubt werden", "vrij krijgen"],
+    ["hinausschieben", "opschuiven, uitstellen"],
+    ["angemessen", "gepast, passend"],
+    ["betreuen", "begeleiden"],
+    ["die Fülle", "de grote hoeveelheid"],
+    ["das Schildchen", "het bordje"],
+    ["der Gipfel", "de top"],
+    ["gespannt", "benieuwd"],
+    ["sich verständigen", "zich verstaanbaar maken"],
+    ["verständigen", "waarschuwen"],
+    ["die Berührung", "het contact"],
+    ["die Herausforderung", "de uitdaging"],
+    // Page 51 – Vakantie en vrije tijd 2
+    ["Feierabend machen", "ophouden (met werken)"],
+    ["gestalten", "vorm geven, inrichten"],
+    ["die Bildungsreise", "de culturele reis"],
+    ["sich erholen", "herstellen"],
+    ["im Begriff sein", "op het punt staan"],
+    ["leidenschaftlich", "hartstochtelijk"],
+    ["die Leidenschaft", "de hartstocht"],
+    ["der Ausflug", "het uitstapje"],
+    ["sich betätigen", "actief zijn"],
+    ["schrumpfen", "krimpen, dalen"],
+    ["offensichtlich", "blijkbaar"],
+    ["selbstverständlich", "vanzelfsprekend"],
+    ["ergänzen um", "aanvullen met"],
+    ["ausleihen", "lenen, uitlenen"],
+    ["sich langweilen", "zich vervelen"],
+    ["die Vorlage", "het voorbeeld"],
+    ["die Hetze", "de drukte"],
+    ["verzichten auf", "afzien van"],
+    ["beschwerlich", "vermoeiend, lastig"],
+    ["sich aufhalten", "verblijven"],
+    // Page 53 – Verkeer en vervoer 2
+    ["der Führerschein", "het rijbewijs"],
+    ["gefährden", "in gevaar brengen"],
+    ["der Entzug", "de onttrekking"],
+    ["die Entziehung", "de onttrekking, de afkik"],
+    ["der Engpass", "het knooppunt"],
+    ["einstellen", "stilleggen"],
+    ["eintreffen", "aankomen"],
+    ["der Hubschrauber", "de helikopter"],
+    ["der Fahrschein", "het kaartje, het biljet"],
+    ["der Schalter", "het loket"],
+    ["die öffentlichen Verkehrsmittel", "het openbaar vervoer"],
+    ["befördern", "vervoeren"],
+    ["planmäßig", "volgens plan"],
+    ["der Zuschlag", "de toeslag"],
+    ["der Fahrgast", "de passagier"],
+    ["der Fluggast", "de passagier (vliegtuig)"],
+    ["die Postleitzahl", "de postcode"],
+    ["fünfstellig", "met 5 cijfers"],
+    ["das Schließfach", "het kluisje"],
+    ["tatsächlich", "feitelijk"],
+    ["die Bahn", "de trein, de tram"],
+    ["der Fahrplan", "de dienstregeling"],
+    // Page 55 – Wel en wee 2
+    ["verletzt", "gewond, geblesseerd"],
+    ["anfällig", "vatbaar"],
+    ["überschüssig", "overtallig"],
+    ["der Facharzt", "de specialist"],
+    ["nähren", "voeden"],
+    ["sich ernähren", "zich voeden, eten"],
+    ["sich ernähren von", "leven van"],
+    ["die Ernährung", "de voeding"],
+    ["fördern", "bevorderen"],
+    ["der Kreislauf", "de bloedsomloop"],
+    ["der Muskel", "de spier"],
+    ["der Krebs", "de kanker"],
+    ["altern", "ouder worden"],
+    ["die Reizung", "de prikkeling, de irritatie"],
+    ["reizvoll", "bekoorlijk"],
+    ["empfindlich", "gevoelig"],
+    ["der Abbau", "de afbraak"],
+    ["vorhersagen", "voorspellen"],
+    ["die Vorhersage", "de verwachting"],
+    ["arbeitsunfähig", "arbeidsongeschikt"],
+    ["das Gutachten", "het rapport, het attest"],
+    ["der Gutachter", "de deskundige"],
+    ["impfen", "inenten"],
+    ["die Spritze", "de prik, het spuitje"],
+    // Page 56 – Wetenschap en techniek 1
+    ["die Anerkennung", "de waardering, erkenning"],
+    ["voraussetzen", "veronderstellen"],
+    ["forschen", "onderzoek doen"],
+    ["die Forschung", "het (wetenschappelijk) onderzoek"],
+    ["hervorgehen aus", "blijken uit"],
+    ["ergründen", "grondig onderzoeken"],
+    ["sich ergeben", "opleveren"],
+    ["das Ergebnis", "het resultaat"],
+    ["die Tagung", "het congres"],
+    ["tagen", "zitting houden"],
+    ["der Sachverständige", "de deskundige"],
+    ["der Schwerpunkt", "het zwaartepunt"],
+    ["zutreffen", "kloppen, uitkomen"],
+    ["der Fund", "de vondst"],
+    ["die Erkenntnis", "het inzicht"],
+    ["scheitern", "mislukken"],
+    ["beobachten", "observeren"],
+    ["belegen", "bewijzen"],
+    ["der Vorgang", "het proces"],
+    ["vorgehen", "gebeuren"],
+    ["absichern", "beveiligen"],
+    ["die Anweisung", "de instructie"],
+    // Page 57 – Wetenschap en techniek 2
+    ["der Fortschritt", "de vooruitgang"],
+    ["der Schritt", "de schrede, de stap"],
+    ["schrittweise", "stap voor stap"],
+    ["die Leistung", "de prestatie"],
+    ["die Leistungsfähigkeit", "de productiviteit"],
+    ["leistungsfähig", "productief"],
+    ["leisten", "presteren"],
+    ["aufzeichnen", "noteren"],
+    ["die Aufzeichnung", "de aantekening"],
+    ["der Erfinder", "de uitvinder"],
+    ["austauschbar", "uitwisselbaar"],
+    ["tauschen", "ruilen"],
+    ["skeptisch", "sceptisch"],
+    ["berechtigt", "terecht, gerechtvaardigd"],
+    ["die Disziplin", "de discipline, de tak van wetenschap"],
+    ["einbüßen", "verliezen"],
+    ["das Verfahren", "het procédé"],
+    ["herstellen", "produceren"],
+    ["fördern", "stimuleren"],
+    ["verzögern", "vertragen"],
+    ["die Daten", "de gegevens"],
+    ["speichern", "opslaan"],
+    ["die Anwendung", "de toepassing"],
+    ["jeweilig", "respectief"],
+    // Page 64 – Losse woorden
+    ["abermals", "nogmaals"],
+    ["allerdings", "weliswaar, echter"],
+    ["also", "dus"],
+    ["anscheinend", "klaarblijkelijk"],
+    ["außerdem", "bovendien"],
+    ["bereits", "reeds"],
+    ["daher", "daarom, daarvandaan"],
+    ["demnach", "dientengevolge, daarom"],
+    ["demzufolge", "als gevolg daarvan"],
+    ["dennoch", "toch, desondanks"],
+    ["deshalb", "daarom"],
+    ["deswegen", "daarom"],
+    ["durchaus", "absoluut, volstrekt"],
+    ["freilich", "echter, evenwel"],
+    ["gegebenenfalls (ggf.)", "eventueel, indien nodig"],
+    ["geradezu", "gewoonweg, bepaald"],
+    ["häufig", "vaak"],
+    ["immerhin", "in elk geval, hoe dan ook"],
+    ["indem", "doordat; terwijl"],
+    ["indes", "intussen"],
+    ["jedenfalls", "in elk geval"],
+    ["jedoch", "echter"],
+    ["jenseits + 2", "aan de andere kant van"],
+    ["keineswegs", "geenszins, in geen geval"],
+    ["längst", "allang"],
+    ["mittlerweile", "ondertussen"],
+    ["nach und nach", "langzamerhand"],
+    ["nach wie vor", "nog steeds"],
+    ["nahezu", "bijna"],
+    ["samt + 3", "(samen) met"],
+    ["schließlich", "tenslotte, per saldo"],
+    ["seitdem", "sindsdien"],
+    ["sogar", "zelfs"],
+    ["somit", "daarom"],
+    ["sondern", "maar"],
+    ["sonst", "anders, overigens"],
+    ["ständig", "constant, voortdurend"],
+    ["statt + 2", "in plaats van"],
+    ["stattdessen", "in plaats daarvan"],
+    ["tatsächlich", "inderdaad, feitelijk"],
+    ["trotz", "ondanks"],
+    ["trotzdem", "desondanks"],
+    ["überhaupt", "over het algemeen"],
+    ["verhältnismäßig", "betrekkelijk, relatief"],
+    ["vorausgesetzt, dass", "op voorwaarde dat"],
+    ["vor kurzem", "kort geleden"],
+    ["wider", "tegen"],
+    ["zudem", "bovendien"],
+    ["zumal (da)", "vooral omdat"],
+    ["zunächst", "eerst"],
+    ["zuweilen", "soms"],
+  ];
+
+  // ── BUILT-IN LIST ─────────────────────────────────────────────────────────
+  const BUILTIN = { id: '__builtin__', name: 'Boek', pairs: pairs, builtin: true };
+
+  // ── AUTH CONSTANT ─────────────────────────────────────────────────────────
+  const PASSWORD = 'fang';
+
+  // ── GITHUB CONFIG ─────────────────────────────────────────────────────────
+  const GITHUB_OWNER  = 'ChainJFA';
+  const GITHUB_REPO   = 'flashcards';
+  const GITHUB_PATH   = 'lists';
+  const GITHUB_BRANCH = 'main';
+
+  // ── STATE ─────────────────────────────────────────────────────────────────
+  let deck = [];           // shuffled indices
+  let deckPos = 0;         // position in deck
+  let history = [];        // visited indices for "prev"
+  let historyPos = -1;     // position in history (for prev/next through history)
+  let flipped = false;
+  let scoreCorrect = 0;
+  let scoreWrong = 0;
+  let assessed = false;    // did user press correct/wrong for this card?
+  let activePairs = pairs; // the pair array currently being studied
+  let activeListId = '__builtin__';
+  let editingListId = null;
+  let githubLists = [];    // populated async by fetchGithubLists()
+
+  // ── INIT ──────────────────────────────────────────────────────────────────
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function buildDeck() {
+    deck = shuffle(activePairs.map((_, i) => i));
+    deckPos = 0;
+  }
+
+  function init() {
+    buildDeck();
+    history = [deck[0]];
+    historyPos = 0;
+    showCard(deck[0]);
+  }
+
+  // ── DISPLAY ───────────────────────────────────────────────────────────────
+  function showCard(pairIndex) {
+    const [german, dutch] = activePairs[pairIndex];
+    const cardEl = document.getElementById('card');
+
+    // Snap card back to front instantly (no animation) so the new Dutch
+    // answer on the back face is never visible during the transition.
+    cardEl.style.transition = 'none';
+    cardEl.classList.remove('flipped');
+
+    // Update content while card is face-forward
+    document.getElementById('frontWord').textContent = german;
+    document.getElementById('backGerman').textContent = german;
+    document.getElementById('backDutch').textContent = dutch;
+
+    flipped = false;
+    assessed = false;
+    document.getElementById('assessButtons').classList.remove('visible');
+
+    // Re-enable transition on next frame so future flips animate normally
+    requestAnimationFrame(() => { cardEl.style.transition = ''; });
+
+    // Counter & progress
+    const pos = historyPos + 1;
+    const total = activePairs.length;
+    document.getElementById('cardCounter').textContent = `Kaart ${pos} / ${total}`;
+    document.getElementById('progressFill').style.width = `${(pos / total) * 100}%`;
+
+    // Score
+    document.getElementById('scoreCorrect').textContent = scoreCorrect;
+    document.getElementById('scoreWrong').textContent   = scoreWrong;
+  }
+
+  // ── FLIP ──────────────────────────────────────────────────────────────────
+  function flipCard() {
+    if (flipped) return;
+    flipped = true;
+    document.getElementById('card').classList.add('flipped');
+    setTimeout(() => {
+      document.getElementById('assessButtons').classList.add('visible');
+    }, 300);
+  }
+
+  // ── ASSESSMENT ────────────────────────────────────────────────────────────
+  function markCorrect() {
+    if (assessed) return;
+    assessed = true;
+    scoreCorrect++;
+    nextCard();
+  }
+
+  function markWrong() {
+    if (assessed) return;
+    assessed = true;
+    scoreWrong++;
+    nextCard();
+  }
+
+  // ── NAVIGATION ────────────────────────────────────────────────────────────
+  function nextCard() {
+    // If we're not at the end of history, just advance in history
+    if (historyPos < history.length - 1) {
+      historyPos++;
+      showCard(history[historyPos]);
+      return;
+    }
+
+    // Advance deck position
+    deckPos++;
+
+    // Reshuffle when deck exhausted
+    if (deckPos >= deck.length) {
+      buildDeck();
+      showDeckComplete();
+      return;
+    }
+
+    const nextIndex = deck[deckPos];
+    history.push(nextIndex);
+    historyPos = history.length - 1;
+    showCard(nextIndex);
+  }
+
+  function prevCard() {
+    if (historyPos <= 0) return;
+    historyPos--;
+    showCard(history[historyPos]);
+  }
+
+  // ── DECK COMPLETE ─────────────────────────────────────────────────────────
+  function showDeckComplete() {
+    document.getElementById('cardScene').style.display = 'none';
+    document.getElementById('assessButtons').style.display = 'none';
+    document.querySelector('#screen-study .nav-buttons').style.display = 'none';
+    document.querySelector('#screen-study .progress-bar-wrap').style.display = 'none';
+
+    const total = scoreCorrect + scoreWrong;
+    const pct   = total > 0 ? Math.round((scoreCorrect / total) * 100) : 0;
+    document.getElementById('finalScore').textContent =
+      `Score: ${scoreCorrect} goed van ${total} beoordeeld (${pct}%)`;
+
+    document.getElementById('deckComplete').style.display = 'flex';
+  }
+
+  function restartDeck() {
+    scoreCorrect = 0;
+    scoreWrong   = 0;
+    history      = [];
+    historyPos   = -1;
+
+    document.getElementById('cardScene').style.display  = '';
+    document.getElementById('assessButtons').style.display = '';
+    document.querySelector('#screen-study .nav-buttons').style.display = '';
+    document.querySelector('#screen-study .progress-bar-wrap').style.display = '';
+    document.getElementById('deckComplete').style.display  = 'none';
+
+    init();
+  }
+
+  // ── KEYBOARD ──────────────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('screen-study').classList.contains('active')) return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    switch (e.key) {
+      case ' ':
+      case 'ArrowUp':
+        e.preventDefault();
+        flipCard();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        nextCard();
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (!flipped) flipCard(); else nextCard();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        prevCard();
+        break;
+      case '1':
+        if (flipped) markWrong();
+        break;
+      case '2':
+        if (flipped) markCorrect();
+        break;
+    }
+  });
+
+  // ── SCREEN MANAGEMENT ─────────────────────────────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('[data-screen]').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ── LOCAL STORAGE HELPERS ─────────────────────────────────────────────────
+  function loadCustomLists() {
+    try { return JSON.parse(localStorage.getItem('fc_custom_lists')) || []; }
+    catch { return []; }
+  }
+  function saveCustomLists(arr) {
+    localStorage.setItem('fc_custom_lists', JSON.stringify(arr));
+  }
+  function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
+  // ── AUTH ──────────────────────────────────────────────────────────────────
+  function tryLogin() {
+    const input = document.getElementById('loginPasswordInput');
+    const error = document.getElementById('loginError');
+    if (input.value === PASSWORD) {
+      sessionStorage.setItem('fc_auth', '1');
+      error.classList.remove('visible');
+      input.value = '';
+      goHome();
+    } else {
+      error.classList.add('visible');
+      // Re-trigger shake animation via reflow trick
+      input.classList.remove('shake');
+      void input.offsetWidth;
+      input.classList.add('shake');
+      input.addEventListener('animationend', () => input.classList.remove('shake'), { once: true });
+      input.select();
+    }
+  }
+
+  // ── GITHUB HELPERS ────────────────────────────────────────────────────────
+  function ghFileName(filename) {
+    return filename
+      .replace(/\.[^.]+$/, '')          // strip extension
+      .replace(/[_-]+/g, ' ')           // underscores/dashes → spaces
+      .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+  }
+
+  async function fetchGithubLists() {
+    // Return from session cache if available
+    try {
+      const cached = sessionStorage.getItem('fc_gh_lists');
+      if (cached) { githubLists = JSON.parse(cached); return; }
+    } catch { /* ignore */ }
+
+    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}?ref=${GITHUB_BRANCH}`;
+    let dirData;
+    try {
+      const resp = await fetch(apiUrl);
+      if (resp.status === 404) return;
+      if (resp.status === 403) throw new Error('rate-limit');
+      if (!resp.ok) return;
+      dirData = await resp.json();
+    } catch (err) {
+      if (err.message === 'rate-limit') throw err;
+      return;
+    }
+
+    const txtFiles = dirData.filter(f => f.type === 'file' && f.name.endsWith('.txt'));
+    if (txtFiles.length === 0) return;
+
+    const results = await Promise.allSettled(
+      txtFiles.map(async f => {
+        const r = await fetch(f.download_url);
+        if (!r.ok) return null;
+        const text = await r.text();
+        const { pairs: parsedPairs } = parsePairsInput(text);
+        if (parsedPairs.length === 0) return null;
+        return { id: `__gh__${f.name}`, name: ghFileName(f.name), pairs: parsedPairs, github: true };
+      })
+    );
+
+    githubLists = results
+      .filter(r => r.status === 'fulfilled' && r.value !== null)
+      .map(r => r.value);
+
+    try { sessionStorage.setItem('fc_gh_lists', JSON.stringify(githubLists)); } catch { /* quota */ }
+  }
+
+  function getAllLists() {
+    return [BUILTIN, ...githubLists, ...loadCustomLists()];
+  }
+  function getListById(id) {
+    return getAllLists().find(l => l.id === id) || null;
+  }
+
+  // ── HOME SCREEN ───────────────────────────────────────────────────────────
+  function buildListCardHtml(list) {
+    const count = list.pairs.length;
+    const safeId = escHtml(list.id);
+    if (list.builtin) {
+      return `
+        <div class="list-card" id="lc-${safeId}">
+          <div class="list-card-info">
+            <div class="list-card-name">${escHtml(list.name)}</div>
+            <div class="list-card-count">${count} woord${count !== 1 ? 'en' : ''}</div>
+          </div>
+          <div class="list-card-actions">
+            <button class="btn-lc btn-lc-study" onclick="startStudy('${safeId}')">Studeren →</button>
+          </div>
+        </div>`;
+    } else if (list.github) {
+      return `
+        <div class="list-card" id="lc-${safeId}">
+          <div class="list-card-info">
+            <div class="list-card-name">${escHtml(list.name)}<span class="gh-badge">🐙 GitHub</span></div>
+            <div class="list-card-count">${count} woord${count !== 1 ? 'en' : ''}</div>
+          </div>
+          <div class="list-card-actions">
+            <button class="btn-lc btn-lc-study" onclick="startStudy('${safeId}')">Studeren →</button>
+          </div>
+        </div>`;
+    } else {
+      return `
+        <div class="list-card" id="lc-${safeId}">
+          <div class="list-card-info">
+            <div class="list-card-name">${escHtml(list.name)}</div>
+            <div class="list-card-count">${count} woord${count !== 1 ? 'en' : ''}</div>
+            <div class="confirm-row" id="confirm-${safeId}">
+              Zeker verwijderen?
+              <button class="btn-confirm-yes" onclick="deleteList('${safeId}')">Ja</button>
+              <button class="btn-confirm-no"  onclick="cancelDelete('${safeId}')">Nee</button>
+            </div>
+          </div>
+          <div class="list-card-actions">
+            <button class="btn-lc btn-lc-edit"  onclick="openEditScreen('${safeId}')">✎</button>
+            <button class="btn-lc btn-lc-del"   onclick="confirmDelete('${safeId}')">🗑</button>
+            <button class="btn-lc btn-lc-study" onclick="startStudy('${safeId}')">Studeren →</button>
+          </div>
+        </div>`;
+    }
+  }
+
+  async function renderHomeScreen() {
+    const container = document.getElementById('home-list-container');
+
+    // Phase 1: render BUILTIN + custom lists immediately (sync)
+    const syncLists = [BUILTIN, ...loadCustomLists()];
+    container.innerHTML = syncLists.map(buildListCardHtml).join('');
+
+    // Phase 2: insert GitHub loading spinner (only if not yet cached)
+    const ghCached = !!sessionStorage.getItem('fc_gh_lists');
+    if (!ghCached) {
+      const loaderHtml = `<div class="gh-loading-row" id="gh-loading-placeholder"><div class="gh-spinner"></div>GitHub lijsten laden…</div>`;
+      const builtinCard = document.getElementById(`lc-__builtin__`);
+      if (builtinCard) builtinCard.insertAdjacentHTML('afterend', loaderHtml);
+      else container.insertAdjacentHTML('beforeend', loaderHtml);
+    }
+
+    // Phase 3: fetch GitHub lists
+    let rateLimited = false;
+    try {
+      await fetchGithubLists();
+    } catch (err) {
+      if (err.message === 'rate-limit') rateLimited = true;
+    }
+
+    // Phase 4: replace spinner with results
+    const placeholder = document.getElementById('gh-loading-placeholder');
+    if (placeholder) placeholder.remove();
+
+    const builtinCard = document.getElementById('lc-__builtin__');
+    if (rateLimited) {
+      const msg = `<div class="gh-rate-limit">⚠ GitHub niet bereikbaar</div>`;
+      if (builtinCard) builtinCard.insertAdjacentHTML('afterend', msg);
+    } else if (githubLists.length > 0) {
+      const ghHtml = githubLists.map(buildListCardHtml).join('');
+      if (builtinCard) builtinCard.insertAdjacentHTML('afterend', ghHtml);
+      else container.insertAdjacentHTML('beforeend', ghHtml);
+    }
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function goHome() {
+    await renderHomeScreen();
+    showScreen('screen-home');
+  }
+
+  function confirmDelete(id) {
+    document.getElementById(`confirm-${id}`).classList.add('visible');
+  }
+  function cancelDelete(id) {
+    document.getElementById(`confirm-${id}`).classList.remove('visible');
+  }
+  function deleteList(id) {
+    if (id === '__builtin__' || id.startsWith('__gh__')) return;
+    const custom = loadCustomLists().filter(l => l.id !== id);
+    saveCustomLists(custom);
+    if (activeListId === id) {
+      activePairs  = pairs;
+      activeListId = '__builtin__';
+      localStorage.setItem('fc_active_list_id', '__builtin__');
+    }
+    goHome();
+  }
+
+  // ── START STUDYING ────────────────────────────────────────────────────────
+  function startStudy(listId) {
+    const list = getListById(listId);
+    if (!list || list.pairs.length === 0) return;
+    activePairs  = list.pairs;
+    activeListId = listId;
+    localStorage.setItem('fc_active_list_id', listId);
+
+    // Reset study state
+    scoreCorrect = 0;
+    scoreWrong   = 0;
+    history      = [];
+    historyPos   = -1;
+
+    // Restore card/nav visibility in case deck-complete was showing
+    document.getElementById('cardScene').style.display  = '';
+    document.getElementById('assessButtons').style.display = '';
+    document.querySelector('#screen-study .nav-buttons').style.display = '';
+    document.querySelector('#screen-study .progress-bar-wrap').style.display = '';
+    document.getElementById('deckComplete').style.display  = 'none';
+
+    // Show list name in study header
+    document.getElementById('studyListName').textContent = list.name;
+
+    showScreen('screen-study');
+    init();
+  }
+
+  // ── ADD / EDIT SCREEN ─────────────────────────────────────────────────────
+  function openAddScreen() {
+    editingListId = null;
+    document.getElementById('addScreenTitle').textContent = 'Nieuwe lijst';
+    document.getElementById('listNameInput').value = '';
+    document.getElementById('pairsTextarea').value = '';
+    document.getElementById('nameError').textContent = '';
+    document.getElementById('parseWarning').textContent = '';
+    showScreen('screen-add');
+  }
+
+  function openEditScreen(id) {
+    const list = getListById(id);
+    if (!list) return;
+    editingListId = id;
+    document.getElementById('addScreenTitle').textContent = 'Lijst bewerken';
+    document.getElementById('listNameInput').value = list.name;
+    document.getElementById('pairsTextarea').value = list.pairs.map(p => p.join(';')).join('\n');
+    document.getElementById('nameError').textContent = '';
+    document.getElementById('parseWarning').textContent = '';
+    showScreen('screen-add');
+  }
+
+  function parsePairsInput(text) {
+    const lines = text.replace(/\r\n/g, '\n').split('\n');
+    const result = [];
+    const errors = [];
+    lines.forEach((raw, i) => {
+      const line = raw.trim();
+      if (!line) return;
+      let parts = null;
+      if (line.includes(';'))   parts = line.split(';').map(s => s.trim());
+      else if (line.includes('\t')) parts = line.split('\t').map(s => s.trim());
+      else if (line.includes(' \u2013 ')) parts = line.split(' \u2013 ').map(s => s.trim());
+      else if (line.includes(' - ')) parts = line.split(' - ').map(s => s.trim());
+      if (!parts || parts.length < 2 || !parts[0] || !parts[1]) {
+        errors.push(i + 1);
+      } else {
+        result.push([parts[0], parts[1]]);
+      }
+    });
+    return { pairs: result, errors };
+  }
+
+  function saveList() {
+    const name = document.getElementById('listNameInput').value.trim();
+    const text = document.getElementById('pairsTextarea').value;
+    document.getElementById('nameError').textContent = '';
+    document.getElementById('parseWarning').textContent = '';
+
+    if (!name) {
+      document.getElementById('nameError').textContent = 'Geef de lijst een naam.';
+      document.getElementById('listNameInput').focus();
+      return;
+    }
+    const { pairs: newPairs, errors } = parsePairsInput(text);
+    if (newPairs.length === 0) {
+      document.getElementById('parseWarning').textContent = 'Voer minimaal één geldig woordpaar in (Duits;Nederlands).';
+      return;
+    }
+    if (errors.length > 0) {
+      document.getElementById('parseWarning').textContent =
+        `⚠ Regel${errors.length > 1 ? 's' : ''} ${errors.join(', ')} kon${errors.length > 1 ? 'den' : ''} niet worden verwerkt en ${errors.length > 1 ? 'zijn' : 'is'} overgeslagen.`;
+    }
+
+    const custom = loadCustomLists();
+    if (editingListId) {
+      const idx = custom.findIndex(l => l.id === editingListId);
+      if (idx !== -1) {
+        custom[idx] = { ...custom[idx], name, pairs: newPairs };
+        // If currently studying this list, update activePairs live
+        if (activeListId === editingListId) activePairs = newPairs;
+      }
+    } else {
+      custom.push({ id: generateId(), name, created: Date.now(), pairs: newPairs });
+    }
+    saveCustomLists(custom);
+    goHome();
+  }
+
+  // ── START ─────────────────────────────────────────────────────────────────
+  (async function restoreSession() {
+    // Auth gate: show login if not authenticated in this session
+    if (sessionStorage.getItem('fc_auth') !== '1') {
+      showScreen('screen-login');
+      document.getElementById('loginPasswordInput').focus();
+      return;
+    }
+    // Restore last-used list (GitHub lists may not be loaded yet → fall back to builtin)
+    const savedId = localStorage.getItem('fc_active_list_id') || '__builtin__';
+    const list = getListById(savedId);
+    if (list) {
+      activePairs  = list.pairs;
+      activeListId = list.id;
+    } else {
+      activePairs  = BUILTIN.pairs;
+      activeListId = '__builtin__';
+    }
+    await renderHomeScreen();
+    showScreen('screen-home');
+  })();
+  </script>
+</body>
+</html>
