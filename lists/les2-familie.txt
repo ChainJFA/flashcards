@@ -1,0 +1,12 @@
+family;familie
+mother;moeder
+father;vader
+brother;broer
+sister;zus
+little;klein
+have fun;lol hebben
+make music;muziek maken
+talk about everything;over alles praten
+annoying;irritant
+great;geweldig
+homework;huiswerk
