@@ -1,0 +1,22 @@
+type;type, soort
+electric;elektrisch
+ice;ijs
+rock;rots
+grass;gras
+ground;grond
+dragon;draak
+ghost;geest
+normal;normaal, gewoon
+damage;schade
+win;winnen
+lose;verliezen
+ten;tien
+twenty;twintig
+thirty;dertig
+forty;veertig
+fifty;vijftig
+sixty;zestig
+seventy;zeventig
+eighty;tachtig
+ninety;negentig
+one hundred;honderd
