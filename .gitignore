@@ -1,0 +1,15 @@
+# Local secrets — never commit these
+.github-token
+
+# Local dev files
+node_modules/
+*.log
+
+# Source images (large, not needed in repo)
+*.jpg
+*.jpeg
+*.png
+
+# Local server
+server.js
+.claude/
