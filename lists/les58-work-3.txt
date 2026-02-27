@@ -1,0 +1,29 @@
+trainee/intern;stagiair
+traineeship/internship;stage
+to resign;ontslag nemen
+assignment;opdracht
+profession/occupation;beroep
+to qualify;een diploma behalen
+qualification;bevoegdheid/diploma
+qualified;bevoegd/gediplomeerd
+manual(ly);met de hand
+manual;handleiding
+on behalf of;namens
+to quit;opgeven/stoppen met
+expat;expat
+temporary;tijdelijk
+employment agency;uitzendbureau
+temp;uitzendkracht
+to temp;als uitzendkracht werken
+to recruit;werven/aantrekken
+(ir)responsible;(on)verantwoordelijk
+responsibility;verantwoordelijkheid
+to merge;fuseren
+merger;fusie
+demand for;vraag naar
+to demand;eisen
+demand;eis
+to give in;toegeven
+trial;proef
+to co-operate;samenwerken
+co-operation;samenwerking
