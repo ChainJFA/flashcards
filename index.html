@@ -349,6 +349,7 @@
       text-overflow: ellipsis;
     }
     .list-card-count { font-size: 0.8rem; color: #a0a8c0; margin-top: 2px; }
+    .list-card-date  { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
     .list-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
     .btn-lc {
       padding: 8px 14px;
@@ -1287,12 +1288,20 @@
 
     const results = await Promise.allSettled(
       txtFiles.map(async f => {
-        const r = await fetch(f.download_url);
+        const [r, cr] = await Promise.all([
+          fetch(f.download_url),
+          fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/commits?path=${GITHUB_PATH}/${f.name}&per_page=1`)
+        ]);
         if (!r.ok) return null;
         const text = await r.text();
         const { pairs: parsedPairs } = parsePairsInput(text);
         if (parsedPairs.length === 0) return null;
-        return { id: `__gh__${f.name}`, name: ghFileName(f.name), pairs: parsedPairs, github: true };
+        let created = null;
+        try {
+          const commits = await cr.json();
+          if (commits.length > 0) created = new Date(commits[0].commit.committer.date).getTime();
+        } catch { /* ignore */ }
+        return { id: `__gh__${f.name}`, name: ghFileName(f.name), pairs: parsedPairs, github: true, created };
       })
     );
 
@@ -1301,6 +1310,11 @@
       .map(r => r.value);
 
     try { sessionStorage.setItem('fc_gh_lists', JSON.stringify(githubLists)); } catch { /* quota */ }
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return '';
+    return new Date(ts).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   function getAllLists() {
@@ -1326,22 +1340,26 @@
           </div>
         </div>`;
     } else if (list.github) {
+      const dateStr = list.created ? fmtDate(list.created) : '';
       return `
         <div class="list-card" id="lc-${safeId}">
           <div class="list-card-info">
             <div class="list-card-name">${escHtml(list.name)}<span class="gh-badge">🐙 GitHub</span></div>
             <div class="list-card-count">${count} woord${count !== 1 ? 'en' : ''}</div>
+            ${dateStr ? `<div class="list-card-date">📅 ${dateStr}</div>` : ''}
           </div>
           <div class="list-card-actions">
             <button class="btn-lc btn-lc-study" onclick="startStudy('${safeId}')">Studeren →</button>
           </div>
         </div>`;
     } else {
+      const dateStr = list.created ? fmtDate(list.created) : '';
       return `
         <div class="list-card" id="lc-${safeId}">
           <div class="list-card-info">
             <div class="list-card-name">${escHtml(list.name)}</div>
             <div class="list-card-count">${count} woord${count !== 1 ? 'en' : ''}</div>
+            ${dateStr ? `<div class="list-card-date">📅 ${dateStr}</div>` : ''}
             <div class="confirm-row" id="confirm-${safeId}">
               Zeker verwijderen?
               <button class="btn-confirm-yes" onclick="deleteList('${safeId}')">Ja</button>
