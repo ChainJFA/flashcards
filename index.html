@@ -1020,7 +1020,7 @@
   ];
 
   // ── BUILT-IN LIST ─────────────────────────────────────────────────────────
-  const BUILTIN = { id: '__builtin__', name: 'Boek', pairs: pairs, builtin: true };
+  const BUILTIN = { id: '__builtin__', name: 'Boek', pairs: pairs, builtin: true, created: new Date('2026-02-25').getTime() };
 
   // ── AUTH CONSTANT ─────────────────────────────────────────────────────────
   const PASSWORD = 'fang';
@@ -1329,11 +1329,13 @@
     const count = list.pairs.length;
     const safeId = escHtml(list.id);
     if (list.builtin) {
+      const dateStr = list.created ? fmtDate(list.created) : '';
       return `
         <div class="list-card" id="lc-${safeId}">
           <div class="list-card-info">
             <div class="list-card-name">${escHtml(list.name)}</div>
             <div class="list-card-count">${count} woord${count !== 1 ? 'en' : ''}</div>
+            ${dateStr ? `<div class="list-card-date">📅 ${dateStr}</div>` : ''}
           </div>
           <div class="list-card-actions">
             <button class="btn-lc btn-lc-study" onclick="startStudy('${safeId}')">Studeren →</button>
