@@ -1,0 +1,28 @@
+groothandel;wholesale
+detailhandel;retail
+detailhandelaar/winkelier;retailer
+schuld;debt
+failliet gaan;to go bankrupt/to go broke
+tegenslag;setback
+vanaf het begin;from scratch
+verzekeren;to insure
+verzekering;insurance
+dekken;to cover
+oprichten/stichten;to establish/to found
+investeren;to invest
+overplaatsen;to transfer
+vestigen;to locate
+profiteren;to profit/to benefit
+welvarend;prosperous
+welvaart;prosperity
+stimuleren;to boost
+omzet;turnover
+uitvinden;to invent
+uitvinding;invention
+recessie;recession/slump
+snelle groei;boom
+snel groeien;to boom
+vraag en aanbod;supply and demand
+gelijkwaardig;equivalent
+veiling;auction
+pakhuis/magazijn;warehouse
