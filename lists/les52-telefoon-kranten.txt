@@ -1,0 +1,24 @@
+mobile phone/cell phone;mobiele telefoon
+dial;wijzerplaat/kiesschijf/draaien
+keypad;toetsenbord
+area code;netnummer/kengetal
+country code;landnummer
+landline phone;vaste telefoon
+engaged;in gesprek
+answering machine;antwoordapparaat
+to record;opnemen
+battery;batterij
+indispensable;onmisbaar
+phone box/call box;telefooncel
+phone booth;telefooncel
+phone card/calling card;telefoonkaart
+phone credit/calling credit;beltegoed
+to top up;opwaarderen
+editor;redacteur
+letter to the editor;ingezonden brief
+magazine;tijdschrift
+issue;nummer (tijdschrift)
+headline;(kranten)kop
+local;plaatselijk/lokaal
+cutting;knipsel
+tabloid;sensatiekrant
