@@ -1,0 +1,31 @@
+job centre;arbeidsbureau/UWV
+vacancy;vacature
+to apply (for);solliciteren (naar)
+application;sollicitatie
+letter of application;sollicitatiebrief
+applicant;sollicitant
+job interview;sollicitatiegesprek
+experience;ervaring
+experienced;ervaren
+post/position;betrekking/baan
+to turn down;afwijzen
+to experience;meemaken/ervaren
+to prepare;voorbereiden
+prepared;bereid
+wage;loon
+to strike;staken
+strike;staking
+(trade) union;vakbond
+to dismiss;ontslaan
+dismissal;ontslag
+to sack/to fire;ontslaan
+labour;arbeid
+work permit;werkvergunning
+shift;ploegendienst
+carpenter;timmerman
+plumber;loodgieter
+to appoint;benoemen
+appointment;benoeming/afspraak
+capable/able;bekwaam
+capability/ability;vermogen
+to earn;verdienen
