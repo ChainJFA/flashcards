@@ -1257,17 +1257,24 @@
 
   // ── GITHUB HELPERS ────────────────────────────────────────────────────────
   function ghFileName(filename) {
+    const upper = new Set(['nl', 'en', 'ae', 'uk', 'ceo', 'vat', 'btw', 'hr']);
     return filename
       .replace(/\.[^.]+$/, '')          // strip extension
       .replace(/[_-]+/g, ' ')           // underscores/dashes → spaces
-      .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+      .replace(/\w\S*/g, w => {
+        const low = w.toLowerCase();
+        return upper.has(low) ? low.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+      });
   }
 
   async function fetchGithubLists() {
-    // Return from session cache if available
+    // Return from session cache if available and all entries have dates
     try {
       const cached = sessionStorage.getItem('fc_gh_lists');
-      if (cached) { githubLists = JSON.parse(cached); return; }
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.every(l => l.created)) { githubLists = parsed; return; }
+      }
     } catch { /* ignore */ }
 
     const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}?ref=${GITHUB_BRANCH}`;
