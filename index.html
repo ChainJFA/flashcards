@@ -1295,19 +1295,13 @@
 
     const results = await Promise.allSettled(
       txtFiles.map(async f => {
-        const [r, cr] = await Promise.all([
-          fetch(f.download_url),
-          fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/commits?path=${GITHUB_PATH}/${f.name}&per_page=1`)
-        ]);
+        const r = await fetch(f.download_url);
         if (!r.ok) return null;
         const text = await r.text();
         const { pairs: parsedPairs } = parsePairsInput(text);
         if (parsedPairs.length === 0) return null;
-        let created = null;
-        try {
-          const commits = await cr.json();
-          if (commits.length > 0) created = new Date(commits[0].commit.committer.date).getTime();
-        } catch { /* ignore */ }
+        const lastModified = r.headers.get('Last-Modified');
+        const created = lastModified ? new Date(lastModified).getTime() : null;
         return { id: `__gh__${f.name}`, name: ghFileName(f.name), pairs: parsedPairs, github: true, created };
       })
     );
