@@ -1,0 +1,28 @@
+warenhuis;department store
+speelgoedafdeling;toy department
+winkel;store
+supermarkt;grocery store (AE)
+boodschappen/levensmiddelen;groceries
+souterrain/kelder;basement
+roltrap;escalator
+lift;elevator (AE)
+rondkijken/bladeren;to browse
+etalage;shop window
+merk;brand
+inpakken;to wrap
+afprijzen/verlagen;to reduce
+korting;discount
+koopje;bargain
+BTW;VAT
+voorraad;stock
+klant;customer
+verkoper/verkoopster;shop assistant
+winkelwagentje;shopping cart/shopping trolley
+kassa/bon;cashdesk/receipt
+ruilen;to exchange
+binnen;within
+artikel;item
+terugbetalen;to refund
+uitstallen/tonen;to display
+ten gebruiken tot (TGT);use by
+ten hoogste houdbaar tot (THT);best before
