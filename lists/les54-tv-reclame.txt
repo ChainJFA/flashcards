@@ -1,0 +1,27 @@
+serial;serie (vervolgverhaal)
+series;tv-reeks
+instalment/episode;aflevering
+viewing figures/TV ratings;kijkcijfers
+viewer;kijker
+station;zender
+to receive;ontvangen
+channel;kanaal
+aerial;antenne
+dish;schotelantenne
+to broadcast;uitzenden
+coverage;verslaggeving
+media coverage;media-aandacht
+presenter;presentator
+to advertise;adverteren
+advertisement;advertentie
+ad/advert;advertentie
+commercial;reclamespot
+to skip;overslaan
+footage;filmfragment/beelden
+advertising agency;reclamebureau
+campaign;campagne
+to launch;lanceren/starten
+to meet expectations;aan de verwachtingen voldoen
+to fall short of;niet voldoen aan
+ban;verbod
+standard;norm
