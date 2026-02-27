@@ -1,0 +1,26 @@
+data;gegevens
+to process;verwerken
+word processor;tekstverwerker
+to hack;kraken
+access;toegang
+connection;verbinding
+wireless;draadloos
+to store;bewaren
+to save;opslaan
+file;bestand
+to charge;opladen
+charger;oplader
+failure/breakdown;storing
+keyboard;toetsenbord
+at sign;apenstaartje
+attachment;bijlage
+to delete/to erase;wissen
+to install;installeren
+icon;pictogram/icoon
+nickname;schuilnaam/bijnaam
+frequently;vaak
+to subscribe to;zich abonneren op
+subscription;abonnement
+virtual;bijna echt/virtueel
+virtually;praktisch/bijna
+search engine;zoekmachine
