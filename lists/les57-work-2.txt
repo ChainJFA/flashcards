@@ -1,0 +1,27 @@
+to retire;met pensioen gaan
+retirement;pensionering
+to employ;in dienst hebben
+employee;werknemer
+employer;werkgever
+employment;werk
+unemployment;werkloosheid
+unemployed;werkloos
+accustomed to/used to;gewend aan
+to negotiate;onderhandelen
+negotiation;onderhandeling
+to manufacture;fabriceren
+manufacturer;fabrikant
+to earn a living;de kost verdienen
+livelihood;middel van bestaan
+consultant;consultant/adviseur
+consultancy;adviesbureau
+to require;vereisen
+requirement;vereiste
+skill;vaardigheid
+(un)skilled staff/personnel;(on)geschoold personeel
+personnel manager/HR manager;personeelschef/HR manager
+to supervise;toezicht houden op
+supervision;toezicht
+benefit;uitkering
+to be entitled to;recht hebben op
+to involve;inhouden/met zich meebrengen
