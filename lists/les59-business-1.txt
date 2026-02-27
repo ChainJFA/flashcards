@@ -1,0 +1,31 @@
+business;zaak
+entrepreneur;ondernemer
+managing director;algemeen directeur
+CEO;bestuursvoorzitter/CEO
+to manage;besturen/leiden
+management;bestuur/leiding/directie
+board of directors;raad van commissarissen
+firm;firma
+profit;winst
+profitable;winstgevend
+lucrative;lucratief
+share/stock;aandeel
+shareholder;aandeelhouder
+to share;delen
+stock exchange;aandelenbeurs
+to invest;investeren/beleggen
+to risk;riskeren
+risky;riskant
+trade;handel
+to trade;handelen
+commerce;handel
+to expand;uitbreiden
+expansion;uitbreiding
+to compete;concurreren
+competition;concurrentie
+competitive;concurrerend
+fierce;fel/hevig
+growth;groei
+to lag behind;achterblijven bij
+to guarantee;garanderen
+guarantee;garantie
