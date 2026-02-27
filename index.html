@@ -1381,17 +1381,15 @@
     const container = document.getElementById('home-list-container');
 
     // Phase 1: render BUILTIN + custom lists immediately (sync), sorted by date desc
-    const customSorted = loadCustomLists().sort((a, b) => (b.created || 0) - (a.created || 0));
-    const syncLists = [BUILTIN, ...customSorted];
+    const syncLists = [BUILTIN, ...loadCustomLists()]
+      .sort((a, b) => (b.created || 0) - (a.created || 0));
     container.innerHTML = syncLists.map(buildListCardHtml).join('');
 
     // Phase 2: insert GitHub loading spinner (only if not yet cached)
     const ghCached = !!sessionStorage.getItem('fc_gh_lists');
     if (!ghCached) {
       const loaderHtml = `<div class="gh-loading-row" id="gh-loading-placeholder"><div class="gh-spinner"></div>GitHub lijsten laden…</div>`;
-      const builtinCard = document.getElementById(`lc-__builtin__`);
-      if (builtinCard) builtinCard.insertAdjacentHTML('afterend', loaderHtml);
-      else container.insertAdjacentHTML('beforeend', loaderHtml);
+      container.insertAdjacentHTML('beforeend', loaderHtml);
     }
 
     // Phase 3: fetch GitHub lists
@@ -1402,20 +1400,16 @@
       if (err.message === 'rate-limit') rateLimited = true;
     }
 
-    // Phase 4: re-render all lists (github + custom) sorted by date desc
+    // Phase 4: re-render entire container with all lists sorted by date desc
     const placeholder = document.getElementById('gh-loading-placeholder');
     if (placeholder) placeholder.remove();
 
-    const builtinCard = document.getElementById('lc-__builtin__');
     if (rateLimited) {
-      const msg = `<div class="gh-rate-limit">⚠ GitHub niet bereikbaar</div>`;
-      if (builtinCard) builtinCard.insertAdjacentHTML('afterend', msg);
-    } else if (githubLists.length > 0) {
-      const allSorted = [...githubLists, ...loadCustomLists()]
+      container.insertAdjacentHTML('beforeend', `<div class="gh-rate-limit">⚠ GitHub niet bereikbaar</div>`);
+    } else {
+      const allSorted = [BUILTIN, ...githubLists, ...loadCustomLists()]
         .sort((a, b) => (b.created || 0) - (a.created || 0));
-      const allHtml = allSorted.map(buildListCardHtml).join('');
-      if (builtinCard) builtinCard.insertAdjacentHTML('afterend', allHtml);
-      else container.insertAdjacentHTML('beforeend', allHtml);
+      container.innerHTML = allSorted.map(buildListCardHtml).join('');
     }
   }
 
