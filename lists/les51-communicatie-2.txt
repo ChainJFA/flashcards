@@ -1,0 +1,28 @@
+mass media;massamedia
+postcode;postcode
+zip code (AE);postcode
+parcel/package;pakje
+to deliver;bezorgen/leveren
+delivery;bezorging/levering
+courier;koerier
+to inform;inlichten/mededelen
+to notify;bekendmaken
+to respond;reageren/antwoorden
+response;reactie/respons
+(un)intelligible;(on)begrijpelijk
+to keep in touch;contact houden
+to text;sms'en
+snail mail;slakkenpost
+junk mail;ongewenste mail
+current;actueel/huidig
+orbit;baan
+bold;vet
+italics;cursieve letters
+font;lettertype
+illegible;onleesbaar
+to address;toespreken
+address/speech;toespraak
+inquiry (into);onderzoek (naar)
+to make enquiries/inquiries;inlichtingen vragen
+to announce;bekendmaken/aankondigen
+announcement;bekendmaking
